@@ -3,7 +3,7 @@
  * Plugin Name: pensopay Payments
  * Plugin URI: http://wordpress.org/plugins/pensopay/
  * Description: Integrates your pensopay payment gateway into your WooCommerce installation.
- * Version: 7.1.7
+ * Version: 7.1.9
  * Author: pensopay
  * Text Domain: woo-pensopay
  * Domain Path: /languages/
@@ -11,13 +11,14 @@
  * Wiki: https://pensopay.zendesk.com/hc/da
  * WC requires at least: 8.2.0
  * WC tested up to: 10.2.2
+ * Requires Plugins: woocommerce
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'WCPP_VERSION', '7.1.7' );
+define( 'WCPP_VERSION', '7.1.9' );
 define( 'WCPP_URL', plugins_url( __FILE__ ) );
 define( 'WCPP_PATH', plugin_dir_path( __FILE__ ) );
 
@@ -301,8 +302,6 @@ function init_pensopay_gateway() {
 
 				if ( WC_PensoPay_Helper::option_is_enabled( $this->s( 'pensopay_orders_transaction_info', 'yes' ) ) ) {
 					add_filter( 'manage_edit-shop_order_columns', [ $this, 'filter_shop_order_posts_columns' ], 10, 1 );
-					add_filter( 'manage_shop_order_posts_custom_column', [ $this, 'apply_custom_order_data' ] );
-					add_filter( 'manage_shop_subscription_posts_custom_column', [ $this, 'apply_custom_order_data' ] );
 					add_action( 'woocommerce_pensopay_accepted_callback', [ $this, 'callback_update_transaction_cache' ], 10, 2 );
 				}
 
@@ -1063,7 +1062,7 @@ function init_pensopay_gateway() {
 
 				// Is the transaction accepted and approved by QP / Acquirer?
 				// Did we find an order?
-				if ( $json->accepted && $order && in_array($transaction->qp_status_code, [WC_PensoPay_VirtualTerminal_Payment::STATUS_APPROVED, WC_PensoPay_VirtualTerminal_Payment::STATUS_3D_SECURE_REQUIRED], false) ) {
+				if ( $json->accepted && $order && in_array($transaction->qp_status_code, [WC_PensoPay_VirtualTerminal_Payment::STATUS_APPROVED, WC_PensoPay_VirtualTerminal_Payment::STATUS_WAITING_APPROVAL,  WC_PensoPay_VirtualTerminal_Payment::STATUS_3D_SECURE_REQUIRED], false) ) {
 					// Overwrite the order object to inherit specific PensoPay logic
 					$order = new WC_PensoPay_Order( $order->get_id() );
 
@@ -1131,7 +1130,7 @@ function init_pensopay_gateway() {
 						'request'        => $request_body,
 					] );
 
-                    if ( $order && ( $transaction->type === 'recurring' || 'rejected' !== $json->state ) ) {
+					if ( $order && $order->needs_payment() && ( $transaction->type === 'recurring' || 'rejected' !== $json->state ) ) {
                         $order->update_status( 'failed', sprintf( 'Payment failed <br />Pensopay Message: %s<br />Acquirer Message: %s', $transaction->qp_status_msg, $transaction->aq_status_msg ) );
                     }
 				}
@@ -1311,12 +1310,12 @@ function init_pensopay_gateway() {
 
 			// Show payment ID and payment link for orders that have not yet
 			// been paid. Show this information even if the transaction ID is missing.
-			$payment_id = $order->get_payment_id();
+			$payment_id = WC_PensoPay_Order_Payments_Utils::get_payment_id( $order );
 			if ( isset( $payment_id ) && ! empty( $payment_id ) ) {
 				printf( '<p><small><strong>%s:</strong> %d</small>', __( 'Payment ID', 'woo-pensopay' ), $payment_id );
 			}
 
-			$payment_link = $order->get_payment_link();
+			$payment_link = WC_PensoPay_Order_Payments_Utils::get_payment_link( $order );
 			if ( isset( $payment_link ) && ! empty( $payment_link ) ) {
 				printf( '<p><small><strong>%s:</strong> <br /><input type="text" style="%s"value="%s" readonly /></small></p>', __( 'Payment Link', 'woo-pensopay' ), 'width:100%', $payment_link );
 			}
