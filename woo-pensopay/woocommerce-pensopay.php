@@ -1,9 +1,9 @@
 <?php
 /**
  * Plugin Name: pensopay Payments
- * Plugin URI: http://wordpress.org/plugins/pensopay/
+ * Plugin URI: https://wordpress.org/plugins/woo-pensopay/
  * Description: Integrates your pensopay payment gateway into your WooCommerce installation.
- * Version: 7.2.3
+ * Version: 7.2.4
  * Author: pensopay
  * Text Domain: woo-pensopay
  * Domain Path: /languages/
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'WCPP_VERSION', '7.2.3' );
+define( 'WCPP_VERSION', '7.2.4' );
 define( 'WCPP_URL', plugins_url( __FILE__ ) );
 define( 'WCPP_PATH', plugin_dir_path( __FILE__ ) );
 
@@ -1042,9 +1042,6 @@ function init_pensopay_gateway() {
 				// Is the transaction accepted and approved by QP / Acquirer?
 				// Did we find an order?
 				if ( $json->accepted && $order && in_array($transaction->qp_status_code, [WC_PensoPay_VirtualTerminal_Payment::STATUS_APPROVED, WC_PensoPay_VirtualTerminal_Payment::STATUS_WAITING_APPROVAL,  WC_PensoPay_VirtualTerminal_Payment::STATUS_3D_SECURE_REQUIRED], false) ) {
-					// Overwrite the order object to inherit specific PensoPay logic
-					$order = new WC_PensoPay_Order( $order->get_id() );
-
 					do_action( 'woocommerce_pensopay_accepted_callback_before_processing', $order, $json );
 					do_action( 'woocommerce_pensopay_accepted_callback_before_processing_status_' . $transaction->type, $order, $json );
 
@@ -1059,7 +1056,7 @@ function init_pensopay_gateway() {
                                     do_action( 'woocommerce_pensopay_callback_subscription_cancelled', $subscription, $order, $transaction, $json );
                                 }
 								// Write a note to the order history
-								$order->note( __( 'Payment cancelled.', 'woo-pensopay' ) );
+								WC_PensoPay_Order_Utils::add_note( $order, __( 'Payment cancelled.', 'woo-pensopay' ) );
 								break;
 
 							case 'capture' :
@@ -1067,7 +1064,7 @@ function init_pensopay_gateway() {
 								break;
 
 							case 'refund' :
-                                $order->note( sprintf( __( 'Refunded %s', 'woo-pensopay' ), WC_PensoPay_Helper::price_normalize( $transaction->amount, $json->currency ) ) );
+                                WC_PensoPay_Order_Utils::add_note( $order, sprintf( __( 'Refunded %s', 'woo-pensopay' ), WC_PensoPay_Helper::price_normalize( $transaction->amount, $json->currency ) ) );
                                 break;
 
                             case 'recurring':
