@@ -2,8 +2,8 @@
 Contributors: pensopay
 Tags: gateway, woocommerce, pensopay, payment, psp
 Requires at least: 6.3
-Tested up to: 6.8.2
-Stable tag: 7.2.4
+Tested up to: 7.1.4
+Stable tag: 7.2.5
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -27,6 +27,10 @@ General:
 3. If WooCommerce Subscriptions is used, the required minimum version is >= 5.0
 
 == Changelog ==
+= 7.2.5 =
+* Fix: Subscription order not autocapturing when enabled for downloadable products.
+* Fix: Link in payment link email contained escaped html.
+
 = 7.2.4 =
 * Fix: Preserve subscription type during payment callbacks. Applies to future subscriptions only.
 

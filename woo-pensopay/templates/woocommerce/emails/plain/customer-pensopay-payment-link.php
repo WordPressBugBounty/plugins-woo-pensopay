@@ -26,7 +26,8 @@ echo sprintf( esc_html__( 'Hi %s,', 'woocommerce' ), esc_html( $order->get_billi
 
 echo esc_html__( 'Thank you for your order.', 'woo-pensopay' ) . "\n\n";
 
-echo sprintf(esc_html__( 'Use the following link to pay and complete your order: %s', 'woo-pensopay' ). $payment_link) . "\n\n";
+/* translators: %s: Payment link to pay the order */
+echo sprintf( esc_html__( 'Use the following link to pay and complete your order: %s', 'woo-pensopay' ), esc_url_raw( $payment_link ) ) . "\n\n";
 
 echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n\n";
 

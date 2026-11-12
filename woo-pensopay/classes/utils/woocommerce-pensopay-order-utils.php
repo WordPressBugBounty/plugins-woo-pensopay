@@ -93,10 +93,22 @@ class WC_PensoPay_Order_Utils {
 		}
 	}
 
+	/**
+	 * Determines whether a product should be treated as virtual in regard to autocapture.
+	 * Products marked as either "Virtual" or "Downloadable" are considered virtual.
+	 *
+	 * @param WC_Product $product
+	 *
+	 * @return bool
+	 */
+	public static function is_virtual_product( WC_Product $product ): bool {
+		return $product->is_virtual() || $product->is_downloadable();
+	}
+
 	public static function contains_virtual_products( WC_Order $order ): bool {
 		$order_items = $order->get_items( 'line_item' );
 		foreach ( $order_items as $order_item ) {
-			if ( ( $order_item instanceof WC_Order_Item_Product ) && ( $product = $order_item->get_product() ) && $product->is_virtual() ) {
+			if ( ( $order_item instanceof WC_Order_Item_Product ) && ( $product = $order_item->get_product() ) && self::is_virtual_product( $product ) ) {
 				return true;
 			}
 		}
@@ -107,7 +119,7 @@ class WC_PensoPay_Order_Utils {
 	public static function contains_physical_products( WC_Order $order ): bool {
 		$order_items = $order->get_items( 'line_item' );
 		foreach ( $order_items as $order_item ) {
-			if ( ( $order_item instanceof WC_Order_Item_Product ) && ( $product = $order_item->get_product() ) && ! $product->is_virtual() ) {
+			if ( ( $order_item instanceof WC_Order_Item_Product ) && ( $product = $order_item->get_product() ) && ! self::is_virtual_product( $product ) ) {
 				return true;
 			}
 		}

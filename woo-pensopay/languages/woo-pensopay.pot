@@ -1376,15 +1376,22 @@ msgstr ""
 msgid "Hi %s,"
 msgstr ""
 
-#. translators: %s: Site title
-#: templates/woocommerce/emails/customer-pensopay-payment-link.php:32
-#: templates/woocommerce/emails/plain/customer-pensopay-payment-link.php:29
+#: templates/woocommerce/emails/customer-pensopay-payment-link.php:31
+msgid "Click the button below to pay and complete your order."
+msgstr ""
+
+#: templates/woocommerce/emails/customer-pensopay-payment-link.php:40
+msgid "Pay for your order"
+msgstr ""
+
+#. translators: %s: Payment link to pay the order
+#: templates/woocommerce/emails/plain/customer-pensopay-payment-link.php:30
 #, php-format
 msgid "Use the following link to pay and complete your order: %s"
 msgstr ""
 
-#: templates/woocommerce/emails/customer-pensopay-payment-link.php:56
-#: templates/woocommerce/emails/plain/customer-pensopay-payment-link.php:54
+#: templates/woocommerce/emails/customer-pensopay-payment-link.php:67
+#: templates/woocommerce/emails/plain/customer-pensopay-payment-link.php:55
 msgid "Thanks for shopping with us."
 msgstr ""
 
